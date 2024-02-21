@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:pertroqwiq/src/common_widgets/loading.dart';
 import 'package:pertroqwiq/src/constants/navbar.dart';
+import 'package:pertroqwiq/src/features/login/screen/login.dart';
 import 'package:pertroqwiq/src/features/order/screen/order.dart';
 import 'package:pertroqwiq/src/features/profile/profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sliding_up_panel/sliding_up_panel.dart';
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -69,6 +71,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon = value;
               })
             });
+  }
+
+  Future<bool> logOut() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('loginData');
+    return prefs.getString('loginData') == null ? true : false;
   }
 
   @override
@@ -150,22 +158,34 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.all(8.0),
                   child: Align(
                     alignment: AlignmentDirectional.topStart,
-                    child: Container(
-                      height: 50,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(5),
-                          boxShadow: [
-                            BoxShadow(
-                                blurRadius: 5,
-                                color: Colors.black,
-                                offset: Offset(1, 3))
-                          ] // Make rounded corner of border
-                          ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: Colors.white,
+                    child: InkWell(
+                      onTap: () {
+                        FutureBuilder(
+                            future: logOut(),
+                            builder: (context, AsyncSnapshot<bool> snapshop) {
+                              print(snapshop.data);
+                              return snapshop.data == true
+                                  ? LoginScreen()
+                                  : HomeScreen();
+                            });
+                      },
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                            color: Colors.black,
+                            borderRadius: BorderRadius.circular(5),
+                            boxShadow: [
+                              BoxShadow(
+                                  blurRadius: 5,
+                                  color: Colors.black,
+                                  offset: Offset(1, 3))
+                            ] // Make rounded corner of border
+                            ),
+                        child: Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),

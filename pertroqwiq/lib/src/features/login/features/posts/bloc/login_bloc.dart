@@ -8,6 +8,7 @@ import 'package:pertroqwiq/src/features/login/features/posts/bloc/login_state.da
 import 'package:pertroqwiq/src/features/login/model/LoginResponse.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginBloc extends Bloc<LoginBlocEvent, LogInState> {
   LoginBloc(LogInState initialState) : super(initialState) {
@@ -37,7 +38,13 @@ Future<LoginResponse> login(String email, String password) async {
   print(_map[0]);
 
   if (response.statusCode == 200) {
-    return LoginResponse.fromJson(_map[0]);
+    final loginData = LoginResponse.fromJson(_map[0]);
+    if (loginData.clientName != null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      prefs.setString('loginData', _map[0].toString());
+    }
+    return loginData;
   } else {
     throw Exception("failed");
   }
